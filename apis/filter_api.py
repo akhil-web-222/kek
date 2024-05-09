@@ -25,8 +25,6 @@ else:
     attn_implementation = "eager"
     torch_dtype = torch.float16
 
-access_token_read = "xyz"
-login(token=access_token_read)
 
 model_checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct'
 model_config = AutoConfig.from_pretrained(model_checkpoint, trust_remote_code=True, max_new_tokens=1024, use_auth_token=True)

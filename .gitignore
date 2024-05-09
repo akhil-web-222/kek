@@ -1,2 +1,5 @@
 .env
 apis/.env
+
+.idea
+/venv
