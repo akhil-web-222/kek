@@ -3,14 +3,14 @@ import pandas as pd
 import json
 import os
 import psutil
-
+#global df
 # Get the total memory capacity in bytes
 total_memory = psutil.virtual_memory().total
 
 # Convert the bytes to gigabytes
 total_memory_gb = total_memory / (1024 * 1024 * 1024)
 
-if total_memory_gb < float(20):
+if total_memory_gb > float(20):
 
     # Define the error message
     error_message = "Insufficient Memory"
@@ -34,8 +34,8 @@ else:
     import dotenv
     dotenv.load_dotenv()
     import os
-    access_token_read = os.getenv('HUGGINGFACE_TOKEN')
-    from apis.filter_api import data_to_json
+    access_token_read = os.getenv('HF_TOKEN')
+    #from apis.filter_api import data_to_json
     def validate_json(json_string):
         """Validates the provided JSON string and returns a formatted preview."""
         try:
@@ -47,9 +47,9 @@ else:
         except json.JSONDecodeError as e:
             st.error(f"Invalid JSON: {e}")
 
-    def filter_data(file, schema, num_rows):
+    def filter_data(df, schema, num_rows):
         """Performs data filtering based on uploaded file, schema, and number of rows."""
-        df = pd.read_csv(file)
+        df = df#pd.read_csv(file)
 
         # Apply schema if provided
         if schema:
@@ -69,7 +69,19 @@ else:
         if st.session_state["output_format"] == "JSON":
             # Convert dataframe to JSON
             json_data = df.to_json(orient="records")
-            #for i in 
+            i=0
+            for index, row in df.iterrows():
+                if i<num_rows:
+                    # Convert the row to a list
+                    list_row = row.tolist()
+                    #print(list_row)
+                    #print("Next row")
+                    #if my_filter(list_row):
+                    #    print(f"Row {index+1} passed the filter: {list_row}") 
+                    data_to_json(schema,str(list_row))
+                    i+=1
+                else:
+                    break
             st.success("Data filtered and converted to JSON:")
             st.code(json_data, language="json")
         else:
@@ -81,6 +93,7 @@ else:
     # Upload CSV file
     uploaded_file = st.file_uploader("Upload CSV file:", type="csv")
     if uploaded_file is not None:
+        #global df
         df = pd.read_csv(uploaded_file)
         st.success("CSV file uploaded!")
         st.write(df.head())
@@ -113,4 +126,4 @@ else:
 
     # Filter button
     if st.button("Filter Data"):
-        filter_data(uploaded_file, schema, num_rows)
+        filter_data(df, schema, num_rows)
