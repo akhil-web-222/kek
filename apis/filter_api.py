@@ -29,9 +29,9 @@ access_token_read = "xyz"
 login(token=access_token_read)
 
 model_checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct'
-model_config = AutoConfig.from_pretrained(model_checkpoint, trust_remote_code=True, max_new_tokens=1024)
-model = AutoModelForCausalLM.from_pretrained(model_checkpoint, trust_remote_code=True, config=model_config, device_map='auto')
-tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+model_config = AutoConfig.from_pretrained(model_checkpoint, trust_remote_code=True, max_new_tokens=1024, use_auth_token=True)
+model = AutoModelForCausalLM.from_pretrained(model_checkpoint, trust_remote_code=True, config=model_config, device_map='auto', use_auth_token=True)
+tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, use_auth_token=True)
 
 
 # Define the generation function

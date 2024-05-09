@@ -14,15 +14,15 @@ from langchain_community.vectorstores import Chroma
 import dotenv
 dotenv.load_dotenv()
 import os
-access_token_read = os.getenv('HUGGINGFACE_TOKEN')
+access_token_read = os.getenv('HF_TOKEN')
 
 # Loading Model and Tokenizer
 model_checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct'
-model_config = AutoConfig.from_pretrained(model_checkpoint, trust_remote_code=True, max_new_tokens=1024)
+model_config = AutoConfig.from_pretrained(model_checkpoint, trust_remote_code=True, max_new_tokens=1024, use_auth_token=True)
 
-model = AutoModelForCausalLM.from_pretrained(model_checkpoint, trust_remote_code=True, config=model_config, device_map='auto')
+model = AutoModelForCausalLM.from_pretrained(model_checkpoint, trust_remote_code=True, config=model_config, device_map='auto', use_auth_token=True)
 
-tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, use_auth_token=True)
 
 # Pipeline Creation
 pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, torch_dtype=torch.float16, max_length=3000, device_map="auto")
