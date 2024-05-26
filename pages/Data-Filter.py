@@ -10,7 +10,7 @@ total_memory = psutil.virtual_memory().total
 # Convert the bytes to gigabytes
 total_memory_gb = total_memory / (1024 * 1024 * 1024)
 
-if total_memory_gb > float(20):
+if total_memory_gb < float(20):
 
     # Define the error message
     error_message = "Insufficient Memory"
@@ -35,7 +35,11 @@ else:
     dotenv.load_dotenv()
     import os
     access_token_read = os.getenv('HF_TOKEN')
-    #from apis.filter_api import data_to_json
+    from apis.filter_api import data_to_json, json_corrector
+    # def json_corrector(json,schema):
+    #     return '{"Hi":"Hi"}'
+    # def data_to_json(schema,content):
+    #     return '{fuckthisshit:"":}'
     def validate_json(json_string):
         """Validates the provided JSON string and returns a formatted preview."""
         try:
@@ -46,6 +50,39 @@ else:
             print(os.getcwd())
         except json.JSONDecodeError as e:
             st.error(f"Invalid JSON: {e}")
+
+    def is_valid_json(data):
+        """
+        This function checks if the given data is valid JSON format.
+
+        Args:
+            data: The data to be checked (str).
+
+        Returns:
+            True if the data is valid JSON, False otherwise.
+        """
+        try:
+            json.loads(data)
+        except (json.JSONDecodeError, TypeError) as e:
+            return False
+        return True
+    
+    def write_json_list_to_file(data, filename):
+        """
+        This function writes a list of JSON strings (objects) to a file, one per line.
+
+        Args:
+            data: A list of strings representing JSON objects.
+            filename: The name of the file to write to (str).
+        """
+        with open(filename, 'w') as f:
+            for item in data:
+                try:
+                    # Validate JSON data (optional)
+                    json.loads(item)
+                    f.write(item + '\n')  # Add newline after each valid JSON object
+                except json.JSONDecodeError:
+                    print(f"WARNING: Skipping invalid JSON object: {item}")
 
     def filter_data(df, schema, num_rows):
         """Performs data filtering based on uploaded file, schema, and number of rows."""
@@ -68,22 +105,49 @@ else:
         # Handle output format
         if st.session_state["output_format"] == "JSON":
             # Convert dataframe to JSON
-            json_data = df.to_json(orient="records")
+            #json_data = df.to_json(orient="records")
+            json_filtered_data = list()
             i=0
+            print("Going in")
             for index, row in df.iterrows():
+                print("First Loop")
                 if i<num_rows:
+                    print("if")
                     # Convert the row to a list
                     list_row = row.tolist()
                     #print(list_row)
                     #print("Next row")
                     #if my_filter(list_row):
                     #    print(f"Row {index+1} passed the filter: {list_row}") 
-                    data_to_json(schema,str(list_row))
-                    i+=1
+                    value = data_to_json(schema,str(list_row))
+                    
+                    if is_valid_json(value):
+                        print("second if")
+                        i+=1
+                        with open("filtered-json-data.txt","w") as data:
+                            data.write(value)
+                        data.close()
+                        json_filtered_data.append(value)
+                    else:
+                        # if j<3:
+                        #     print("third if")
+                        #     json_corrector(value,schema)
+                        # else:
+                        #     with open("filtered-json-data.txt","w") as data:
+                        #         data.write(value)
+                        value = json_corrector(value,schema)                        
+                        with open("filtered-json-data.txt","w") as data:
+                            data.write(value)
+                        data.close()
+                        json_filtered_data.append(value)
                 else:
                     break
+            write_json_list_to_file(json_filtered_data,"filtered-json-data.json")
             st.success("Data filtered and converted to JSON:")
-            st.code(json_data, language="json")
+            with open("filtered-json-data.txt","r") as textfile:
+                text_data = textfile.read()
+                st.code(text_data, language="json")
+            textfile.close()
         else:
             # Write filtered dataframe to CSV
             st.download_button("Download CSV", df.to_csv(index=False), file_name="filtered_data.csv")
