@@ -27,7 +27,9 @@ else:
     torch_dtype = torch.float16
 
 
-model_checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct'
+#model_checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct'
+#model_checkpoint = 'microsoft/Phi-3-medium-128k-instruct'
+model_checkpoint = 'C:\MicroLLM\gemma_2b_it'
 model_config = AutoConfig.from_pretrained(model_checkpoint, trust_remote_code=True, max_new_tokens=1024, use_auth_token=True)
 model = AutoModelForCausalLM.from_pretrained(model_checkpoint, trust_remote_code=True, config=model_config, device_map='auto', use_auth_token=True)
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, use_auth_token=True)
@@ -44,7 +46,7 @@ JSON Format:
 {schema}"""
 
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
-    output_ids = model.generate(**inputs, max_new_tokens=3000, temperature=0.0)
+    output_ids = model.generate(**inputs, max_new_tokens=3000, temperature=0.7)
     output = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
     return output
 
@@ -61,6 +63,6 @@ JSON Format:
 {schema}"""
 
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
-    output_ids = model.generate(**inputs, max_new_tokens=3000, temperature=0.0)
+    output_ids = model.generate(**inputs, max_new_tokens=3000, temperature=0.7)
     output = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
     return output
