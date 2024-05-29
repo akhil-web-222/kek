@@ -1,6 +1,7 @@
 import transformers
 import torch
 import json
+import streamlit as st
 model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
 #model_id = "QuantFactory/Meta-Llama-3-8B-Instruct-GGUF"
 # tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -69,7 +70,7 @@ def is_valid_json(data):
     except (json.JSONDecodeError, TypeError) as e:
         return False
     return True
-
+@st.cache_resource
 def data_to_json(data,schema=schema):
     messages = [
         {"role": "system", "content": f"""

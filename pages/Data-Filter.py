@@ -3,6 +3,14 @@ import pandas as pd
 import json
 import os
 import psutil
+from streamlit.components.v1 import html
+def read_file(filename):
+  fh = open(filename, "r")
+  try:
+      return fh.read()
+  finally:
+      fh.close()
+#from configparser
 #global df
 # Get the total memory capacity in bytes
 total_memory = psutil.virtual_memory().total
@@ -35,8 +43,27 @@ else:
     dotenv.load_dotenv()
     import os
     access_token_read = os.getenv('HF_TOKEN')
+    def pop_up_window_click(activate: bool = True) -> None:
+        """Pop up window overlapping to disable user interaction"""
+        if activate:
+            html(read_file("./static/activate_popup_js_injection.html"), height=0)
+
+        # deactivate and clean url
+        else:
+            html(read_file("./static/deactivate_popup_js_injection.html"), height=0)
+            
+            # it's optional if you need to revert to the original url
+            html(read_file("./static/clean_url_js_injection.html"), height=0)
+
+        st.session_state["need_rerun"] = True
+
+
+    def pop_up_window() -> str:
+        """Read PopUp window overlapping to disable user interaction"""
+        return read_file("./static/popup_window.html")
     #from apis.filter_api import data_to_json, json_corrector
     from apis.json_api import data_to_json, write_json_list_to_file, write_to_text_file
+    
     def validate_json(json_string):
         """Validates the provided JSON string and returns a formatted preview."""
         try:
@@ -47,7 +74,7 @@ else:
             print(os.getcwd())
         except json.JSONDecodeError as e:
             st.error(f"Invalid JSON: {e}")
-
+    @st.cache_resource
     def filter_data(df, schema, num_rows):
         """Performs data filtering based on uploaded file, schema, and number of rows."""
         df = df#pd.read_csv(file)
@@ -126,4 +153,23 @@ else:
 
     # Filter button
     if st.button("Filter Data"):
+        # create st.empty() container
+        placeholder = st.empty()
+
+        # insert part with popup initialization button for our HTML page to container
+        placeholder.write(pop_up_window(), unsafe_allow_html=True)
+
+        # activate pop overlay by clicking on button
+        pop_up_window_click(activate=True)
+
+        # Run long-duration function
         filter_data(df, schema, num_rows)
+
+        # Deactivate pop overlay by clicking on the close button
+        pop_up_window_click(activate=False)
+
+        # Clean st.empty() container
+        placeholder.empty()
+
+        st.success(icon="🎉")
+        
