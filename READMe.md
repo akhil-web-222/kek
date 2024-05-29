@@ -111,9 +111,15 @@ notepad .env
 ```
 Inside the `.env` file, add a line in the following format
 ```
-HF_TOKEN=your_hugging_face_token
+HF_TOKEN = your_hugging_face_token
 ```
 Replace `your_hugging_face_token` with your actual Hugging Face access token. You can obtain your token by creating an account and following the instructions here: [User Access Tokens](https://huggingface.co/docs/hub/en/security-tokens)
+
+## Running the Server
+
+```shell
+streamlit run Chat_Interface.py
+```
 
 # For Running on Google Colab
 

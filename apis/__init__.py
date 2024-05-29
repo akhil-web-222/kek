@@ -2,13 +2,14 @@ import os
 import sys
 import dotenv
 
-file_dir = os.path.dirname(__file__)
-sys.path.append(file_dir)
+# file_dir = os.path.dirname(__file__)
+# sys.path.append(file_dir)
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# from .rag_api import rag_api
+# from .filter_api import filter_api
 
-from .rag_api import rag_api
-from .filter_api import filter_api
-
-
+import rag_api
+import filter_api
 
 
 

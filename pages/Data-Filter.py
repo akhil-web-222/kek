@@ -37,10 +37,6 @@ else:
     access_token_read = os.getenv('HF_TOKEN')
     #from apis.filter_api import data_to_json, json_corrector
     from apis.json_api import data_to_json, write_json_list_to_file, write_to_text_file
-    # def json_corrector(json,schema):
-    #     return '{"Hi":"Hi"}'
-    # def data_to_json(schema,content):
-    #     return '{fuckthisshit:"":}'
     def validate_json(json_string):
         """Validates the provided JSON string and returns a formatted preview."""
         try:
@@ -77,7 +73,7 @@ else:
             json_filtered_data = list()
             for index,row in df.iterrows():
                 if index < num_rows:
-                    data = data_to_json(row)
+                    data = data_to_json(row,schema)
                     json_filtered_data.append(data)
                 else:
                     break
