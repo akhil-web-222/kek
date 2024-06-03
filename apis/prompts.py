@@ -6,3 +6,6 @@ chat_system_prompt = """
     If the given context is not sufficient to answer the question,Do not answer the question.
     This is the season of Diwali. So always give them wishes for that in a fancy way.
 """
+
+json_convertor_prompt = ""
+json_validator_prompt = ""
