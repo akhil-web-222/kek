@@ -41,9 +41,9 @@ def load_model(base_model, max_seq_length, dtype, load_in_4bit):
     return model, tokenizer
 
 @st.cache_resource
-def get_peft_model(model, r, target_modules, lora_alpha, lora_dropout, bias, use_gradient_checkpointing, use_rslora, use_dora, loftq_config):
+def get_peft_model(_model, r, target_modules, lora_alpha, lora_dropout, bias, use_gradient_checkpointing, use_rslora, use_dora, loftq_config):
     model = FastLanguageModel.get_peft_model(
-        model,
+        _model,
         r=r,
         target_modules=target_modules,
         lora_alpha=lora_alpha,
@@ -63,16 +63,16 @@ def load_dataset_train(dataset_info):
     return dataset_train
 
 @st.cache_resource
-def setup_trainer(model, tokenizer, dataset_train, training_args, dataset_text_field, max_seq_length):
+def setup_trainer(_model, _tokenizer, _dataset_train, _training_args, _dataset_text_field, _max_seq_length):
     trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        train_dataset=dataset_train,
-        dataset_text_field=dataset_text_field,
-        max_seq_length=max_seq_length,
+        model=_model,
+        tokenizer=_tokenizer,
+        train_dataset=_dataset_train,
+        dataset_text_field=_dataset_text_field,
+        max_seq_length=_max_seq_length,
         dataset_num_proc=2,
         packing=False,
-        args=training_args,
+        args=_training_args,
     )
     return trainer
 
