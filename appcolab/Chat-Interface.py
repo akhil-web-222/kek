@@ -2,6 +2,9 @@ import streamlit as st
 from st_chat_message import message
 #from streamlit_chat import message
 from streamlit.components.v1 import html
+from huggingface_hub import login
+hutoken = "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"
+login(token=hutoken)
 def read_file(filename):
   fh = open(filename, "r")
   try:
@@ -32,8 +35,8 @@ except:
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import Chroma
-import dotenv
-dotenv.load_dotenv()
+from langchain_community.llms import HuggingFacePipeline
+
 # Get the total memory capacity in bytes
 total_memory = psutil.virtual_memory().total
 
@@ -61,10 +64,6 @@ if total_memory_gb < float(20):
     except:
         st.toast('Error: GPU not detected', icon='❗️')
 else:
-    import dotenv
-    dotenv.load_dotenv()
-    import os
-    access_token_read = os.getenv('HUGGINGFACE_TOKEN')
     #from apis.rag_api import chat
     @st.cache_resource
     def llm():
@@ -77,9 +76,9 @@ else:
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, use_auth_token=True)
 
         # Pipeline Creation
-        pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, torch_dtype=torch.float16, max_length=3000, device_map="auto")
+        pipy = pipeline("text-generation", model=model, tokenizer=tokenizer, torch_dtype=torch.float16, max_length=3000, device_map="auto")
 
-        llmpipe = HuggingFacePipeline(pipeline=pipeline)
+        llmpipe = HuggingFacePipeline(pipeline=pipy)
         return llmpipe
     # Parsing function
     def parse(string):
@@ -90,9 +89,9 @@ else:
     @st.cache_resource
     def retriever():
         try:
-            loader = JSONLoader("/data/data.json")
+            loader = JSONLoader("/content/CorrectedData.json")
         except:
-            loader = TextLoader("/data/data.txt")
+            loader = TextLoader("/content/Alldata.txt")
         documents = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         texts = text_splitter.split_documents(documents)
@@ -106,7 +105,7 @@ else:
         return retrieverdata
     
     # Pipeline Object
-    @st.cache_resource
+    # @st.cache_resource
     class Pipeline:
         def __init__(self,llm,retriever):
             self.llm = llm
@@ -144,7 +143,7 @@ else:
             prompt  = self.augment(question,context)
             answer  = self.llm.invoke(prompt)
             return self.parse(answer)
-    @st.cache_resource    
+    # @st.cache_resource    
     def pipe():    
         piped = Pipeline(llm(),retriever())
         return piped

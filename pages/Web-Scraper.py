@@ -198,17 +198,24 @@ def scrape_data(websites, phones, max_size):
             st.warning("CSV file not found. Scraping might not have been successful.")        
     # #Insert a completed popup after this
     #Show a sample of the contents in the CSV file
-def amazon_scraper(query,max):
+def amazon_scraper(query, max):
+    # Open the Amazon website
     driver.get('https://amazon.in')
-
+    
+    # Maximize the browser window
     driver.maximize_window()
+    
+    # Locate the search box and search button elements
     input_search = driver.find_element(By.ID, 'twotabsearchtextbox')
     search_button = driver.find_element(By.ID, 'nav-search-submit-button')
+    
+    # Enter the search query and click the search button
     input_search.send_keys(query)
     time.sleep(1)
     search_button.click()
 
     try:
+        # Try to refine search results by brand
         brand_refinements = driver.find_element(By.ID, "brandsRefinements")
         brand_list = brand_refinements.find_element(By.CSS_SELECTOR, "ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-medium")
         checkbox_labels = brand_list.find_elements(By.CSS_SELECTOR, "label")
@@ -217,33 +224,36 @@ def amazon_scraper(query,max):
             if not checkbox_input.is_selected():
                 label.click()
     except:
-        pass
+        pass  # If no brand refinements are found, proceed without filtering
 
+    # XPath for product elements
     product_class = '//div[@data-component-type="s-search-result"]'
 
-    products = []
+    products = []  # List to store product details
     page_number = 1
     while True:
         print("Outer loop")
-        product_elements = driver.find_elements(By.XPATH, product_class)
+        product_elements = driver.find_elements(By.XPATH, product_class)  # Get all product elements on the page
 
-        for i in range(0,max):
+        for i in range(0, max):  # Loop through the product elements up to the specified max number
             product_element = product_elements[i]
             print("Inside Loop")
             try:
+                # Try to fetch the product name and price
                 productname = product_element.find_element(By.XPATH, './/span[@class="a-size-medium a-color-base a-text-normal"]').text
                 price = product_element.find_element(By.XPATH, './/span[@class="a-price-whole"]').text
             except:
-                continue
+                continue  # Skip to the next product if there is an error
 
             try:
+                # Try to fetch the product link and open it in a new tab
                 product_link = product_element.find_element(By.XPATH, './/a[@class="a-link-normal s-no-outline"]').get_attribute('href')
                 driver.execute_script("window.open('');")
                 driver.switch_to.window(driver.window_handles[1])
                 driver.get(product_link)
                 time.sleep(2)
 
-                offer_details = []
+                offer_details = []  # List to store offer details
                 offer_sections = driver.find_elements(By.CLASS_NAME, 'a-size-base.a-link-emphasis.vsx-offers-count')
 
                 for offer_section in offer_sections:
@@ -251,8 +261,9 @@ def amazon_scraper(query,max):
                     time.sleep(2)
 
                     try:
-                        side_sheet = driver.find_element(By.ID,'twister-plus-side-sheet-content')
-                        main_section = side_sheet.find_element(By.ID,'tp-side-sheet-main-section')
+                        # Try to fetch the offer details
+                        side_sheet = driver.find_element(By.ID, 'twister-plus-side-sheet-content')
+                        main_section = side_sheet.find_element(By.ID, 'tp-side-sheet-main-section')
                         offers_list_section = main_section.find_element(By.CLASS_NAME, 'a-section.a-spacing-small.a-spacing-top-small.vsx-offers-desktop-lv__list')
                         offer_items = offers_list_section.find_elements(By.CLASS_NAME, 'a-section.vsx-offers-desktop-lv__item')
 
@@ -267,6 +278,7 @@ def amazon_scraper(query,max):
                                 pass
 
                         try:
+                            # Try to fetch additional offers by clicking the "View More" button
                             view_more_button = side_sheet.find_element(By.CSS_SELECTOR, 'a.a-link-normal.a-spacing-mini')
                             driver.execute_script("arguments[0].click();", view_more_button)
                             time.sleep(2)
@@ -288,24 +300,27 @@ def amazon_scraper(query,max):
                     except:
                         pass
 
-                driver.close()
-                driver.switch_to.window(driver.window_handles[0])
+                driver.close()  # Close the tab with the product details
+                driver.switch_to.window(driver.window_handles[0])  # Switch back to the main tab
 
             except:
                 pass
 
+            # Add the product details to the list
             products.append([productname, price, offer_details])
 
         print('scraping page', page_number)
-        break
+        break  # Exit the loop after scraping the first page (remove this line to enable multi-page scraping)
         try:
+            # Try to find and click the next page button
             next_button = driver.find_element(By.CSS_SELECTOR, 'a.s-pagination-item.s-pagination-next.s-pagination-button.s-pagination-separator')
             next_button.click()
             time.sleep(2)
             page_number += 1
         except:
-            break
+            break  # Exit the loop if there is no next page button
 
+    # Save the scraped data to a CSV file
     filename = 'unfiltered-data-amazon.csv'
     with open(filename, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
