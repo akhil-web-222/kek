@@ -258,6 +258,7 @@ import psutil
 import pandas as pd
 import time
 
+# Attempt to import the gpustat library, if not installed, show an error message and stop the app.
 try:
   import gpustat
 except ModuleNotFoundError:
@@ -265,11 +266,11 @@ except ModuleNotFoundError:
   st.stop()
 
 def get_cpu_stats():
-  """Fetches CPU usage."""
+  """Fetches the current CPU usage percentage."""
   return psutil.cpu_percent()
 
 def get_memory_stats():
-  """Fetches memory usage in percentage."""
+  """Fetches the current memory usage percentage."""
   memory_usage = psutil.virtual_memory().percent
   return memory_usage
 
@@ -282,7 +283,7 @@ def get_gpu_stats():
     return None
 
 def display_gpu_info(gpus):
-  """Displays GPU information in a clear and formatted manner."""
+  """Displays GPU information in a clear and formatted manner using a DataFrame."""
   if gpus is None:
     st.warning("No GPUs found on this system.")
     return
@@ -300,7 +301,7 @@ def display_gpu_info(gpus):
   st.table(df)
 
 def display_system_info():
-  """Displays system information, including total memory in GB."""
+  """Displays system information, including total memory capacity in GB."""
   total_memory = psutil.virtual_memory().total
   total_memory_gb = total_memory / (1024 * 1024 * 1024)
   st.subheader("System Information")

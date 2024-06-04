@@ -25,11 +25,12 @@ num_train_epochs = st.number_input("Number of Training Epochs", value=1)
 learning_rate = st.number_input("Learning Rate", value=2e-4, format="%e")
 hugging_face_token = st.text_input("Hugging Face Token", type="password")
 
-# Login to Hugging Face
+# Login to Hugging Face if a token is provided
 if hugging_face_token:
     login(token=hugging_face_token)
     st.success("Logged in to Hugging Face successfully")
 
+# Cache the model loading function to improve performance
 @st.cache_resource
 def load_model(base_model, max_seq_length, dtype, load_in_4bit):
     model, tokenizer = FastLanguageModel.from_pretrained(
@@ -40,6 +41,7 @@ def load_model(base_model, max_seq_length, dtype, load_in_4bit):
     )
     return model, tokenizer
 
+# Cache the PEFT model configuration function
 @st.cache_resource
 def get_peft_model(model, r, target_modules, lora_alpha, lora_dropout, bias, use_gradient_checkpointing, use_rslora, use_dora, loftq_config):
     model = FastLanguageModel.get_peft_model(
@@ -57,11 +59,13 @@ def get_peft_model(model, r, target_modules, lora_alpha, lora_dropout, bias, use
     )
     return model
 
+# Cache the dataset loading function
 @st.cache_resource
 def load_dataset_train(dataset_info):
     dataset_train = load_dataset(dataset_info, split="train")
     return dataset_train
 
+# Cache the trainer setup function
 @st.cache_resource
 def setup_trainer(model, tokenizer, dataset_train, training_args, dataset_text_field, max_seq_length):
     trainer = SFTTrainer(
@@ -121,6 +125,7 @@ config = {
     }
 }
 
+# Start model training when button is clicked
 if st.button("Train Model"):
     with st.spinner("Loading model and tokenizer..."):
         model, tokenizer = load_model(
@@ -175,16 +180,17 @@ if st.button("Train Model"):
         )
 
     with st.spinner("Training the model..."):
-        trainer.train()
+        trainer.train()  # Train the model
 
     st.success("Model training complete!")
 
     with st.spinner("Saving the model..."):
-        model.save_pretrained(config["model_config"]["finetuned_model"])
-        model.push_to_hub(config["model_config"]["finetuned_model"], tokenizer=tokenizer)
+        model.save_pretrained(config["model_config"]["finetuned_model"])  # Save the trained model
+        model.push_to_hub(config["model_config"]["finetuned_model"], tokenizer=tokenizer)  # Push to Hugging Face hub
 
     st.success("Model saved and pushed to Hugging Face Hub!")
 
+# Generate sample inference when button is clicked
 if st.button("Generate Sample Inference"):
     with st.spinner("Loading fine-tuned model..."):
         model, tokenizer = FastLanguageModel.from_pretrained(
@@ -200,8 +206,8 @@ if st.button("Generate Sample Inference"):
             ["system Answer the question truthfully. user This is the question: Do you know about samsung galaxy"],
             return_tensors="pt"
         ).to("cuda")
-        outputs = model.generate(**inputs, max_new_tokens=256, use_cache=True)
-        result = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-        st.write("Inference Result: ", result)
+        outputs = model.generate(**inputs, max_new_tokens=256, use_cache=True)  # Generate response
+        result = tokenizer.batch_decode(outputs, skip_special_tokens=True)  # Decode the output
+        st.write("Inference Result: ", result)  # Display the result
 
     st.success("Inference complete!")
