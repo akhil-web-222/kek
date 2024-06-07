@@ -89,9 +89,9 @@ else:
     @st.cache_resource
     def retriever():
         try:
-            loader = JSONLoader("/content/CorrectedData.json")
+            loader = JSONLoader("/content/kek/updated_Corrected_Data.json")
         except:
-            loader = TextLoader("/content/Alldata.txt")
+            loader = TextLoader("/content/kek/Alldata.txt")
         documents = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         texts = text_splitter.split_documents(documents)
