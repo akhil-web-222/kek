@@ -163,7 +163,7 @@ else:
     if "msgs" not in st.session_state:
         st.session_state.msgs = [
             {
-                "content":"Hi, Hariharan",
+                "content":"Hi, I am Galaxy AI",
                 "is_user":False,
             },
         ]
