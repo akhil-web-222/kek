@@ -58,8 +58,8 @@ else:
             "text-generation",
             model=model_id,
             model_kwargs={"torch_dtype": torch.bfloat16},
-            device_map="auto",
-            offload_folder="offload"
+            device_map="auto"
+            # offload_folder="offload"
         )
         return pipeline
     file = open("/content/kek/schema.json","r")
