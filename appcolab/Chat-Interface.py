@@ -3,7 +3,7 @@ from st_chat_message import message
 #from streamlit_chat import message
 from streamlit.components.v1 import html
 from huggingface_hub import login
-hutoken = "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"
+hutoken = "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"
 login(token=hutoken)
 def read_file(filename):
   fh = open(filename, "r")
