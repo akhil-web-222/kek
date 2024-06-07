@@ -62,7 +62,7 @@ else:
             offload_folder="offload"
         )
         return pipeline
-    file = open("schema.json","r")
+    file = open("/content/kek/schema.json","r")
     schema = file.read()
     print(schema)
 
