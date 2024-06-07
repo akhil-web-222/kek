@@ -1,0 +1,39 @@
+[
+    {
+        "name": "Name of the product",
+        "image": "Link to the product image",
+        "price": {
+            "cost": "Price of the product",
+            "unit": "Currency unit"
+        },
+        "location":"Location of the scraped data",
+        "company":"Company of the product (Ex: Samsung, OnePlus, Apple etc.)",
+        "description": "Description of the product",
+        "category": "Category of the product (Ex: Tablet, Mobile, Earbuds etc.)",
+        "date": "Last updated date of the data in DD:MM:YY format",
+        "time":"Last updated time of the data in HH:MM:SS format",
+        "occasions":[
+            {
+                "occasion-date":"Date of the occasion in DD:MM:YY format",
+                "occasion-name":"Name of the occasion (Ex: Diwali, Holi, Republic Day)"
+            }
+        ],
+        "offers":[
+            {
+                "platform":{
+                    "platform-type": ["online", "offline"],
+                    "name": "Name of the platform (Ex: Amazon, Flipkart etc.)"
+                },
+                "offer-provider":"Name of the offer provider (Ex: HDFC, ICICI etc.)",
+                "offer-amount":"The amount for which the offer is given (Ex: 1100/-)",
+                "offer-provider-category":["bank","institution"],
+                "post-offer-price":"The price of the product after offer",
+                "offer-type": ["card", "emi","partner", "exchange", "festive", "location", "upgrade", "bundled"],
+                "description": "Description of the offer",
+                "validity": "Validity of the offer",
+                "tnc":"Terms and conditions of the offer"
+            }
+        ],
+        "other": "Other details of the product (Ex: Warranty Period, Services etc.)"
+    }
+]
